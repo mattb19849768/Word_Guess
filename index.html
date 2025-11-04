@@ -1,69 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Word Guess</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Guess - Select Player</title>
+<link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <header>
-    <h1>Word Guess</h1>
-    <div class="top-info">
-      <div class="streak-block">🔥 Current Streak: <span id="streak">0</span></div>
-      <div class="word-length-block" id="wordLengthDisplay">Today's word uses 5 letters</div>
-    </div>
-  </header>
-
+<body id="home">
   <main>
-    <section id="gameArea">
-      <div id="boardWrapper">
-        <div id="board" aria-label="Word grid" role="grid"></div>
-      </div>
+    <h1>Word Guess</h1>
+    <p>Select or enter your name to start:</p>
 
-      <div id="keyboard" aria-label="On-screen keyboard"></div>
+    <!-- Dropdown for existing players -->
+    <select id="playerSelect">
+      <option value="" disabled selected>Choose a player</option>
+    </select>
+    <br><br>
 
-      <div id="controls">
-        <p id="message" aria-live="polite"></p>
-        <div class="buttons-row">
-          <button id="newGameBtn" class="control-btn">🔄 New Game</button>
-          <button id="statsBtn" class="control-btn">📊 Statistics</button>
-          <button id="toggleKeyboardBtn" class="control-btn">🔀 Toggle Keyboard</button>
-        </div>
-      </div>
-    </section>
+    <!-- Input for new player -->
+    <input type="text" id="playerName" placeholder="Or enter new player name" />
+    <br><br>
+
+    <button id="startGameBtn" class="control-btn">Start Game</button>
   </main>
 
-  <!-- Statistics Modal -->
-  <div id="statsModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="statsTitle">
-    <div class="modal-content">
-      <button class="close" aria-label="Close statistics">&times;</button>
-      <h2 id="statsTitle">Statistics</h2>
-      <div class="stats-grid">
-        <div class="stat-item">
-          <div class="stat-label">Total Games</div>
-          <div id="totalGames" class="stat-value">0</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Total Wins</div>
-          <div id="totalWins" class="stat-value">0</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Current Streak</div>
-          <div id="currentStreak" class="stat-value">0</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Max Streak</div>
-          <div id="maxStreak" class="stat-value">0</div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <script>
+    const startBtn = document.getElementById('startGameBtn');
+    const playerInput = document.getElementById('playerName');
+    const playerSelect = document.getElementById('playerSelect');
 
-  <footer>
-    <small>Designed for ages 7–12 — friendly words and large buttons.</small>
-  </footer>
+    let players = JSON.parse(localStorage.getItem('players') || '[]');
 
-  <script src="script.js"></script>
+    function renderPlayers() {
+      playerSelect.innerHTML = '<option value="" disabled selected>Choose a player</option>';
+      players.forEach(name => {
+        if (typeof name === 'string') {
+          const option = document.createElement('option');
+          option.value = name;
+          option.textContent = name;
+          playerSelect.appendChild(option);
+        }
+      });
+    }
+
+    startBtn.addEventListener('click', () => {
+      let name = playerInput.value.trim();
+      if (!name) name = playerSelect.value;
+      if (!name) return alert('Please select or enter a player name!');
+      if (!players.includes(name)) {
+        players.push(name);
+        localStorage.setItem('players', JSON.stringify(players));
+      }
+      localStorage.setItem('currentPlayer', name);
+      window.location.href = 'game.html';
+    });
+
+    renderPlayers();
+  </script>
 </body>
 </html>

@@ -1,33 +1,32 @@
 // ----------------------------
-// Wordle for Kids - script.js
+// Game Setup and Variables
 // ----------------------------
+const MAX_GUESSES = 6;
+let currentRow = 0;
+let currentGuess = '';
+let letterStatus = {};
+let currentLayout = "QWERTY";
 
-// DOM Elements
+const QWERTY = ["Q","W","E","R","T","Y","U","I","O","P","A","S","D","F","G","H","J","K","L","Z","X","C","V","B","N","M"];
+const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
 const board = document.getElementById("board");
 const keyboardDiv = document.getElementById("keyboard");
 const message = document.getElementById("message");
-const streakDisplay = document.getElementById("streak");
-const wordLengthDisplay = document.getElementById("wordLengthDisplay");
-
+const toggleBtn = document.getElementById("toggleKeyboardBtn");
+const newGameBtn = document.getElementById("newGameBtn");
 const statsBtn = document.getElementById("statsBtn");
 const statsModal = document.getElementById("statsModal");
-const closeModal = document.querySelector(".close");
-const newGameBtn = document.getElementById("newGameBtn");
-const toggleBtn = document.getElementById("toggleKeyboardBtn");
+const closeModal = statsModal.querySelector(".close");
+const homeBtn = document.getElementById("homeBtn");
+const streakDisplay = document.getElementById("streak");
+const wordLengthDisplay = document.getElementById("wordLengthDisplay");
+const fireworksCanvas = document.getElementById("fireworks");
 
-// Game Variables
-const MAX_GUESSES = 7;
-let solution = '';
-let currentGuess = '';
-let currentRow = 0;
+let solution = "";
+let currentPlayer = localStorage.getItem('currentPlayer') || 'Guest';
 
-// Keyboard layouts
-const QWERTY = "QWERTYUIOPASDFGHJKLZXCVBNM".split("");
-const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-let currentLayout = "QWERTY"; // default
-let letterStatus = {}; // Tracks each letter's status (correct, present, absent)
-
-// 300-word array placeholder (replace with your 300 words)
+// Placeholder word array
 const WORDS = [
 "ABLE","ACID","AGED","ALSO","AREA","ARMY","AWAY","BABY","BACK","BALL",
 "BAND","BANK","BASE","BATH","BEAR","BEAT","BEEF","BEEN","BEER","BELL",
@@ -64,182 +63,251 @@ const WORDS = [
 "WINTER","WONDER","WRITER","YELLOW","YOUNGS","ZEBRAS","ZOOMER","ZODIAC","ZIGZAG","ZAPPER"
 ];
 
-// Statistics
-let totalGames = parseInt(localStorage.getItem("totalGames")) || 0;
-let totalWins = parseInt(localStorage.getItem("totalWins")) || 0;
-let currentStreak = parseInt(localStorage.getItem("currentStreak")) || 0;
-let maxStreak = parseInt(localStorage.getItem("maxStreak")) || 0;
-streakDisplay.textContent = currentStreak;
+// Stats
+let totalGames = parseInt(localStorage.getItem(`${currentPlayer}_totalGames`) || 0);
+let totalWins = parseInt(localStorage.getItem(`${currentPlayer}_totalWins`) || 0);
+let currentStreak = parseInt(localStorage.getItem(`${currentPlayer}_currentStreak`) || 0);
+let maxStreak = parseInt(localStorage.getItem(`${currentPlayer}_maxStreak`) || 0);
 
 // ----------------------------
-// Functions
+// Utility Functions
 // ----------------------------
+function saveStats() {
+    localStorage.setItem(`${currentPlayer}_totalGames`, totalGames);
+    localStorage.setItem(`${currentPlayer}_totalWins`, totalWins);
+    localStorage.setItem(`${currentPlayer}_currentStreak`, currentStreak);
+    localStorage.setItem(`${currentPlayer}_maxStreak`, maxStreak);
+}
+
+function updateStatsDisplay() {
+    document.getElementById('totalGames').textContent = totalGames;
+    document.getElementById('totalWins').textContent = totalWins;
+    document.getElementById('currentStreak').textContent = currentStreak;
+    document.getElementById('maxStreak').textContent = maxStreak;
+    streakDisplay.textContent = currentStreak;
+}
+
 function pickNewWord() {
-    const randomIndex = Math.floor(Math.random() * WORDS.length);
-    solution = WORDS[randomIndex].toUpperCase();
+    solution = WORDS[Math.floor(Math.random() * WORDS.length)];
     wordLengthDisplay.textContent = `Today's word uses ${solution.length} letters`;
 }
 
 function createBoard() {
     board.innerHTML = '';
-    board.style.gridTemplateColumns = `repeat(${solution.length}, 50px)`;
-    for (let r = 0; r < MAX_GUESSES; r++) {
-        for (let c = 0; c < solution.length; c++) {
-            const cell = document.createElement("div");
-            cell.classList.add("cell");
+    board.style.gridTemplateColumns = `repeat(${solution.length}, 50px)`; // fix horizontal tiles
+    for (let i = 0; i < MAX_GUESSES; i++) {
+        for (let j = 0; j < solution.length; j++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
             board.appendChild(cell);
         }
     }
 }
 
-function updateBoard() {
-    const start = currentRow * solution.length;
+
+function createKeyboard() {
+    keyboardDiv.innerHTML = '';
+    let layout = currentLayout === "QWERTY" ? QWERTY : ALPHABET;
+
+    // Create letter keys
+    layout.forEach(letter => {
+        const key = document.createElement('div');
+        key.classList.add('key');
+        key.textContent = letter;
+        key.addEventListener('click', () => handleKey(letter));
+        keyboardDiv.appendChild(key);
+    });
+
+    // Add special keys: Enter and Backspace
+    const enterKey = document.createElement('div');
+    enterKey.classList.add('key');
+    enterKey.textContent = 'ENTER';
+    enterKey.addEventListener('click', submitGuess);
+    keyboardDiv.appendChild(enterKey);
+
+    const backKey = document.createElement('div');
+    backKey.classList.add('key');
+    backKey.textContent = '⌫'; // Unicode backspace symbol
+    backKey.addEventListener('click', () => {
+        currentGuess = currentGuess.slice(0, -1);
+        renderBoard();
+    });
+    keyboardDiv.appendChild(backKey);
+}
+
+
+// ----------------------------
+// Game Logic
+// ----------------------------
+function handleKey(letter) {
+    if (currentGuess.length < solution.length) {
+        currentGuess += letter;
+        renderBoard();
+    }
+}
+
+function submitGuess() {
+    if (currentGuess.length !== solution.length) return;
+    let correct = true;
+    const startIdx = currentRow * solution.length;
     for (let i = 0; i < solution.length; i++) {
-        const cell = board.children[start + i];
+        const cell = board.children[startIdx + i];
+        if (currentGuess[i] === solution[i]) {
+            cell.classList.add('correct', 'animate');
+            letterStatus[currentGuess[i]] = 'correct';
+        } else if (solution.includes(currentGuess[i])) {
+            cell.classList.add('present', 'animate');
+            if (!letterStatus[currentGuess[i]]) letterStatus[currentGuess[i]] = 'present';
+            correct = false;
+        } else {
+            cell.classList.add('absent', 'animate');
+            letterStatus[currentGuess[i]] = 'absent';
+            correct = false;
+        }
+    }
+
+    updateKeyboardColors();
+    if (correct) {
+        message.textContent = "🎉 You Win!";
+        totalGames++;
+        totalWins++;
+        currentStreak++;
+        maxStreak = Math.max(maxStreak, currentStreak);
+        saveStats();
+        updateStatsDisplay();
+        launchFireworks();
+        return;
+    }
+
+    currentRow++;
+    currentGuess = '';
+
+    if (currentRow >= MAX_GUESSES) {
+        message.textContent = `❌ You Lose! Word was ${solution}`;
+        totalGames++;
+        currentStreak = 0;
+        saveStats();
+        updateStatsDisplay();
+    }
+}
+
+function updateKeyboardColors() {
+    document.querySelectorAll('.key').forEach(key => {
+        if (letterStatus[key.textContent]) {
+            key.classList.remove('correct','present','absent');
+            key.classList.add(letterStatus[key.textContent]);
+        }
+    });
+}
+
+function renderBoard() {
+    const startIdx = currentRow * solution.length;
+    for (let i = 0; i < solution.length; i++) {
+        const cell = board.children[startIdx + i];
         cell.textContent = currentGuess[i] || '';
     }
 }
 
-function showMessage(msg) {
-    message.textContent = msg;
+// ----------------------------
+// Fireworks Effect
+// ----------------------------
+function launchFireworks() {
+    const canvas = fireworksCanvas;
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.display = 'block';
+
+    let particles = [];
+
+    function createParticles(x, y) {
+        for (let i = 0; i < 50; i++) {
+            particles.push({
+                x, y,
+                dx: (Math.random()-0.5)*8,
+                dy: (Math.random()-0.5)*8,
+                color: `hsl(${Math.random()*360},100%,50%)`,
+                alpha:1
+            });
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        particles.forEach(p => {
+            p.x += p.dx;
+            p.y += p.dy;
+            p.alpha -= 0.02;
+            ctx.fillStyle = `hsla(${Math.random()*360},100%,50%,${p.alpha})`;
+            ctx.beginPath();
+            ctx.arc(p.x,p.y,3,0,Math.PI*2);
+            ctx.fill();
+        });
+        particles = particles.filter(p => p.alpha>0);
+        if (particles.length>0) requestAnimationFrame(animate);
+    }
+
+    // Launch 5 fireworks at random positions
+    for (let i=0;i<5;i++){
+        const x = Math.random()*canvas.width;
+        const y = Math.random()*canvas.height/2;
+        createParticles(x,y);
+    }
+
+    animate();
+    setTimeout(()=>{canvas.style.display='none';},5000);
 }
 
 // ----------------------------
-// Keyboard
+// Event Listeners
 // ----------------------------
-function createKeyboard() {
-    keyboardDiv.innerHTML = '';
-    const layout = currentLayout === "QWERTY" ? QWERTY : ALPHABET;
-    layout.forEach(key => {
-        const keyBtn = document.createElement("div");
-        keyBtn.classList.add("key");
-        keyBtn.textContent = key;
-        if (letterStatus[key]) keyBtn.classList.add(letterStatus[key]); // preserve color
-        keyBtn.addEventListener("click", () => handleKey(key));
-        keyboardDiv.appendChild(keyBtn);
-    });
-    ["Enter", "Backspace"].forEach(k => {
-        const keyBtn = document.createElement("div");
-        keyBtn.classList.add("key");
-        keyBtn.textContent = k;
-        keyBtn.addEventListener("click", () => handleKey(k));
-        keyboardDiv.appendChild(keyBtn);
-    });
-}
-
-function handleKey(key) {
-    if (key === "Backspace") currentGuess = currentGuess.slice(0, -1);
-    else if (key === "Enter") submitGuess();
-    else if (currentGuess.length < solution.length && /^[A-Z]$/.test(key)) currentGuess += key;
-    updateBoard();
-}
-
-function submitGuess() {
-    if (currentGuess.length !== solution.length) {
-        showMessage(`Please enter ${solution.length} letters`);
-        return;
+document.addEventListener('keydown', (e)=>{
+    if (/^[a-zA-Z]$/.test(e.key)) handleKey(e.key.toUpperCase());
+    if (e.key === 'Enter') submitGuess();
+    if (e.key === 'Backspace') {
+        currentGuess = currentGuess.slice(0,-1);
+        renderBoard();
     }
+});
 
-    const start = currentRow * solution.length;
-    for (let i = 0; i < solution.length; i++) {
-        const cell = board.children[start + i];
-        const letter = currentGuess[i];
-        let status = "absent";
-        if (letter === solution[i]) status = "correct";
-        else if (solution.includes(letter)) status = "present";
+toggleBtn.addEventListener('click', () => {
+    currentLayout = currentLayout === "QWERTY" ? "ALPHABET" : "QWERTY";
+    toggleBtn.textContent = currentLayout === "QWERTY" ? "Alpha Keyboard" : "QWERTY Keyboard";
+    createKeyboard();
+});
 
-        cell.classList.add(status, 'animate');
-        setTimeout(() => cell.classList.remove('animate'), 200);
+newGameBtn.addEventListener('click', ()=>{
+    resetGame();
+});
 
-        markKey(letter, status);
-        letterStatus[letter] = status;
-    }
+statsBtn.addEventListener('click', ()=>{
+    statsModal.style.display='block';
+});
 
-    if (currentGuess === solution) {
-        showMessage("🎉 You guessed it!");
-        totalGames++; totalWins++; currentStreak++;
-        if (currentStreak > maxStreak) maxStreak = currentStreak;
-        updateLocalStorage(); updateStatsDisplay(); disableKeyboard(); return;
-    }
+closeModal.addEventListener('click', ()=>{
+    statsModal.style.display='none';
+});
 
-    currentRow++;
-    if (currentRow >= MAX_GUESSES) {
-        showMessage(`😢 Game over! The word was ${solution}`);
-        totalGames++; currentStreak = 0;
-        updateLocalStorage(); updateStatsDisplay(); disableKeyboard();
-    }
+homeBtn.addEventListener('click', ()=>{
+    window.location.href = 'index.html';
+});
 
-    currentGuess = '';
-}
-
-function markKey(letter, status) {
-    const keyBtns = Array.from(keyboardDiv.children);
-    const keyBtn = keyBtns.find(k => k.textContent === letter);
-    if (!keyBtn) return;
-    keyBtn.classList.remove("correct", "present", "absent");
-    keyBtn.classList.add(status);
-}
-
-function disableKeyboard() {
-    const keys = document.querySelectorAll(".key");
-    keys.forEach(k => k.replaceWith(k.cloneNode(true)));
-}
-
-// ----------------------------
-// Physical keyboard support
-// ----------------------------
-document.addEventListener("keydown", e => {
-    if (e.key === "Enter" || e.key === "Backspace" || /^[a-zA-Z]$/.test(e.key)) handleKey(e.key.toUpperCase());
+window.addEventListener('click', (e)=>{
+    if(e.target === statsModal) statsModal.style.display='none';
 });
 
 // ----------------------------
-// Statistics
+// Reset / Initialize Game
 // ----------------------------
-function updateLocalStorage() {
-    localStorage.setItem("totalGames", totalGames);
-    localStorage.setItem("totalWins", totalWins);
-    localStorage.setItem("currentStreak", currentStreak);
-    localStorage.setItem("maxStreak", maxStreak);
-}
-
-function updateStatsDisplay() {
-    document.getElementById("totalGames").textContent = totalGames;
-    document.getElementById("totalWins").textContent = totalWins;
-    document.getElementById("currentStreak").textContent = currentStreak;
-    document.getElementById("maxStreak").textContent = maxStreak;
-    streakDisplay.textContent = currentStreak;
-}
-
-// ----------------------------
-// Modal
-// ----------------------------
-statsBtn.addEventListener("click", () => { updateStatsDisplay(); statsModal.style.display = "block"; });
-closeModal.addEventListener("click", () => { statsModal.style.display = "none"; });
-window.addEventListener("click", e => { if (e.target === statsModal) statsModal.style.display = "none"; });
-
-// ----------------------------
-// New Game & Toggle
-// ----------------------------
-newGameBtn.addEventListener("click", startNewGame);
-toggleBtn.addEventListener("click", () => { 
-    currentLayout = currentLayout === "QWERTY" ? "ALPHABET" : "QWERTY"; 
-    createKeyboard(); 
-});
-
-// ----------------------------
-// Start / Reset Game
-// ----------------------------
-function startNewGame() {
-    currentRow = 0; currentGuess = '';
-    letterStatus = {}; // reset for new game
+function resetGame() {
+    currentRow=0;
+    currentGuess='';
+    letterStatus={};
+    message.textContent='';
     pickNewWord();
     createBoard();
     createKeyboard();
-    showMessage('');
 }
 
-// ----------------------------
-// Initialize
-// ----------------------------
-startNewGame();
+resetGame();
 updateStatsDisplay();
