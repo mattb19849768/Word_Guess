@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Word Guess</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Word Guess</h1>
+    <div class="top-info">
+      <div class="streak-block">🔥 Current Streak: <span id="streak">0</span></div>
+      <div class="word-length-block" id="wordLengthDisplay">Today's word uses 5 letters</div>
+    </div>
+  </header>
+
+  <main>
+    <section id="gameArea">
+      <div id="boardWrapper">
+        <div id="board" aria-label="Word grid" role="grid"></div>
+      </div>
+
+      <div id="keyboard" aria-label="On-screen keyboard"></div>
+
+      <div id="controls">
+        <p id="message" aria-live="polite"></p>
+        <div class="buttons-row">
+          <button id="newGameBtn" class="control-btn">🔄 New Game</button>
+          <button id="statsBtn" class="control-btn">📊 Statistics</button>
+          <button id="toggleKeyboardBtn" class="control-btn">🔀 Toggle Keyboard</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Statistics Modal -->
+  <div id="statsModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="statsTitle">
+    <div class="modal-content">
+      <button class="close" aria-label="Close statistics">&times;</button>
+      <h2 id="statsTitle">Statistics</h2>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-label">Total Games</div>
+          <div id="totalGames" class="stat-value">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Total Wins</div>
+          <div id="totalWins" class="stat-value">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Current Streak</div>
+          <div id="currentStreak" class="stat-value">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Max Streak</div>
+          <div id="maxStreak" class="stat-value">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <small>Designed for ages 7–12 — friendly words and large buttons.</small>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
