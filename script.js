@@ -94,7 +94,6 @@ const WORDS = [
   {word:"GIFT", clue:"Something you give to someone"},
   {word:"LOVE", clue:"Strong affection"},
   {word:"KING", clue:"A male ruler"},
-  {word:"QUEE", clue:"Female ruler"}, // <-- replace with proper 4-letter word
   {word:"CAGE", clue:"Place where animals are kept"},
   {word:"LION", clue:"Big cat in the jungle"},
   {word:"BEET", clue:"A root vegetable"},
