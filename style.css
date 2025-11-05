@@ -93,7 +93,7 @@ body#home main h1::after {
 }
 
 /* Buttons */
-#startGameBtn, #howToPlayBtn {
+#startGameBtn {
     font-size: 1.2rem;
     padding: 10px 20px;
     margin-top: 10px;
@@ -105,7 +105,7 @@ body#home main h1::after {
     color: white;
     background-color: #ff8c00;
 }
-#startGameBtn:hover, #howToPlayBtn:hover {
+#startGameBtn:hover {
     transform: translateY(-3px);
     background-color: #ffa500;
 }
@@ -258,12 +258,18 @@ body#gameArea header p {
 
 /* Keyboard */
 #keyboard {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: 5px;
+    width: 100%;
     max-width: 600px;
     margin: 0 auto 20px;
 }
+
+.keyboard-row {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 5px;
+}
+
 .key {
     padding: 10px;
     border-radius: 6px;
@@ -274,7 +280,9 @@ body#gameArea header p {
     background-color: #ffe4b5;
     transition: background 0.2s;
     text-align: center;
+    min-width: 35px;
 }
+
 .key.correct { background-color: #32cd32; color:white; }
 .key.present { background-color: #ffa500; color:white; }
 .key.absent { background-color: #d3d3d3; color:white; }
@@ -366,4 +374,40 @@ body#home #howToPlayModalHome {
     background-color: rgba(0,0,0,0.5);
     justify-content: center;
     align-items: center;
+}
+
+#hintModal .modal-content {
+    max-width: 350px;
+}
+#hintModal #hintTextContent {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #ff4500;
+}
+
+/* Common style for all main control buttons */
+/* Common style for control buttons */
+.control-btn {
+    padding: 10px 20px; /* padding for top/bottom and left/right */
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 5px;
+    transition: background-color 0.2s;
+}
+
+.control-btn:hover {
+    background-color: #45a049;
+}
+
+/* Container for buttons */
+.controls-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
 }

@@ -23,7 +23,12 @@
     <div id="board" aria-label="Word grid" role="grid"></div>
   </div>
 
-  <div id="keyboard" aria-label="On-screen keyboard"></div>
+<div id="keyboard">
+  <div class="keyboard-row" id="row1"></div>
+  <div class="keyboard-row" id="row2"></div>
+  <div class="keyboard-row" id="row3"></div>
+</div>
+
 
   <div id="controls">
     <p id="message" aria-live="polite"></p>
@@ -98,6 +103,26 @@
         <p>Use the “💡 Hint” button for a hint, and try to win consecutive games to build your streak!</p>
     </div>
 </div>
+
+<!-- Hint Modal -->
+<div id="hintModal" class="modal" aria-hidden="true" role="dialog">
+  <div class="modal-content">
+    <span class="close" id="closeHint">&times;</span>
+    <h2>💡 Hint</h2>
+    <p id="hintTextContent"></p>
+  </div>
+</div>
+
+<!-- Result Modal -->
+<div id="resultModal" class="modal">
+  <div class="modal-content">
+    <button id="closeResult" class="close">&times;</button>
+    <h2 id="resultTitle"></h2>
+    <p id="resultWord"></p>
+    <button id="resultNewGame" class="control-btn">New Game</button>
+  </div>
+</div>
+
 
 <footer>
   <img src="images/logo.png" alt="Game Hub Logo" class="footer-logo" />
