@@ -24,6 +24,9 @@ const wordLengthDisplay = document.getElementById("wordLengthDisplay");
 const fireworksVideo = document.getElementById("fireworksVideo");
 const fireworksSound = document.getElementById("fireworksSound");
 const hintBtn = document.getElementById("hintBtn");
+const howToPlayBtn = document.getElementById("howToPlayBtn");
+const howToPlayModal = document.getElementById("howToPlayModal");
+const closeHowToPlay = howToPlayModal.querySelector(".close");
 
 let solution = "";
 let solutionClue = "";
@@ -94,6 +97,7 @@ const WORDS = [
   {word:"GIFT", clue:"Something you give to someone"},
   {word:"LOVE", clue:"Strong affection"},
   {word:"KING", clue:"A male ruler"},
+  {word:"QUEE", clue:"Female ruler"}, // <-- replace with proper 4-letter word
   {word:"CAGE", clue:"Place where animals are kept"},
   {word:"LION", clue:"Big cat in the jungle"},
   {word:"BEET", clue:"A root vegetable"},
@@ -351,9 +355,6 @@ const WORDS = [
   {word:"PLANET", clue:"Orbits a star"}
 ];
 
-
-
-
 // Stats
 let totalGames = parseInt(localStorage.getItem(`${currentPlayer}_totalGames`) || 0);
 let totalWins = parseInt(localStorage.getItem(`${currentPlayer}_totalWins`) || 0);
@@ -384,13 +385,12 @@ function pickNewWord() {
     solutionClue = obj.clue;
     wordLengthDisplay.textContent = `Today's word uses ${solution.length} letters`;
 
-    // Log word for testing
     console.log("DEBUG: Today's word is:", solution);
 }
 
 function createBoard() {
     board.innerHTML = '';
-    board.style.gridTemplateColumns = `repeat(${solution.length}, 50px)`; // horizontal tiles
+    board.style.gridTemplateColumns = `repeat(${solution.length}, 50px)`;
     for (let i = 0; i < MAX_GUESSES; i++) {
         for (let j = 0; j < solution.length; j++) {
             const cell = document.createElement('div');
@@ -404,7 +404,6 @@ function createKeyboard() {
     keyboardDiv.innerHTML = '';
     let layout = currentLayout === "QWERTY" ? QWERTY : ALPHABET;
 
-    // Letter keys
     layout.forEach(letter => {
         const key = document.createElement('div');
         key.classList.add('key');
@@ -413,14 +412,12 @@ function createKeyboard() {
         keyboardDiv.appendChild(key);
     });
 
-    // Enter key
     const enterKey = document.createElement('div');
     enterKey.classList.add('key');
     enterKey.textContent = 'ENTER';
     enterKey.addEventListener('click', submitGuess);
     keyboardDiv.appendChild(enterKey);
 
-    // Backspace key
     const backKey = document.createElement('div');
     backKey.classList.add('key');
     backKey.textContent = '⌫';
@@ -464,7 +461,7 @@ function submitGuess() {
     updateKeyboardColors();
 
     if (correct) {
-        message.textContent = "🎉 You Win!";
+        message.textContent = `💡 Hint: ${solutionClue}`;
         totalGames++;
         totalWins++;
         currentStreak++;
@@ -508,12 +505,10 @@ function renderBoard() {
 // Fireworks Video + Sound
 // ----------------------------
 function launchFireworks(){
-    // Video
     fireworksVideo.style.display='block';
     fireworksVideo.currentTime=0;
     fireworksVideo.play();
 
-    // Sound
     fireworksSound.currentTime=0;
     fireworksSound.play();
 
@@ -524,14 +519,14 @@ function launchFireworks(){
     },5000);
 }
 
-const howToPlayBtn = document.getElementById("howToPlayBtn");
-const howToPlayModal = document.getElementById("howToPlayModal");
-const closeHowToPlay = howToPlayModal.querySelector(".close");
-
-
 // ----------------------------
 // Event Listeners
 // ----------------------------
+document.addEventListener('DOMContentLoaded', () => {
+    resetGame();
+    updateStatsDisplay();
+});
+
 document.addEventListener('keydown', (e)=>{
     if (/^[a-zA-Z]$/.test(e.key)) handleKey(e.key.toUpperCase());
     if (e.key === 'Enter') submitGuess();
@@ -548,7 +543,6 @@ toggleBtn.addEventListener('click', () => {
 });
 
 newGameBtn.addEventListener('click', ()=>{ resetGame(); });
-
 statsBtn.addEventListener('click', ()=>{ statsModal.style.display='block'; });
 closeModal.addEventListener('click', ()=>{ statsModal.style.display='none'; });
 homeBtn.addEventListener('click', ()=>{ window.location.href = 'index.html'; });
@@ -561,23 +555,14 @@ hintBtn.addEventListener("click", ()=>{
     }
 });
 
-window.addEventListener('click', (e)=>{
-    if(e.target === statsModal) statsModal.style.display='none';
-});
-
-howToPlayBtn.addEventListener("click", ()=>{
-    howToPlayModal.style.display = "block";
-});
-
-closeHowToPlay.addEventListener("click", ()=>{
-    howToPlayModal.style.display = "none";
-});
+howToPlayBtn.addEventListener("click", ()=>{ howToPlayModal.style.display = "block"; });
+closeHowToPlay.addEventListener("click", ()=>{ howToPlayModal.style.display = "none"; });
 
 // Close modal if clicked outside
 window.addEventListener('click', (e)=>{
+    if(e.target === statsModal) statsModal.style.display='none';
     if(e.target === howToPlayModal) howToPlayModal.style.display='none';
 });
-
 
 // ----------------------------
 // Reset / Initialize Game
@@ -591,6 +576,3 @@ function resetGame() {
     createBoard();
     createKeyboard();
 }
-
-resetGame();
-updateStatsDisplay();

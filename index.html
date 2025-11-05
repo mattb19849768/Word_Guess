@@ -5,265 +5,125 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Word Guess - Select Player</title>
 <link rel="stylesheet" href="style.css">
-<style>
-/* Homepage container */
-body#home {
-    display: flex;
-    justify-content: center;
-    align-items: center; /* center vertically */
-    min-height: 100vh;
-    padding: 20px;
-    background-image: url('images/background.jpg'); /* keep your image */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-.home-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    max-width: 500px;
-}
-
-/* Main card styling */
-body#home main {
-    background-color: rgba(255, 248, 220, 0.85);
-    padding: 30px 40px;
-    border-radius: 12px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-    text-align: center;
-    width: 100%;
-    position: relative;
-    overflow: hidden;
-}
-
-/* Heading styling */
-body#home h1 {
-    font-size: 3rem;
-    background: linear-gradient(90deg, #ff8c00, #ffa500);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-    margin-bottom: 20px;
-    position: relative;
-}
-
-body#home h1::after {
-    content: '';
-    display: block;
-    width: 60%;
-    height: 4px;
-    background: #ff8c00;
-    margin: 10px auto 0;
-    border-radius: 2px;
-    animation: slideIn 1s ease forwards;
-}
-
-@keyframes slideIn {
-    0% { width: 0; }
-    100% { width: 60%; }
-}
-
-/* Spark animations */
-.spark {
-    position: absolute;
-    font-size: 1.5rem;
-    animation: floatUp 2s linear infinite;
-}
-
-@keyframes floatUp {
-    0% { transform: translateY(0) rotate(0deg); opacity:1; }
-    100% { transform: translateY(-80px) rotate(360deg); opacity:0; }
-}
-
-/* Input and dropdown */
-#playerName, #playerSelect {
-    width: 80%;
-    padding: 10px;
-    font-size: 1rem;
-    border-radius: 6px;
-    border: 1px solid #ffa500;
-    margin-bottom: 10px;
-    text-align: center;
-}
-
-/* Buttons */
-#startGameBtn, #howToPlayBtn {
-    font-size: 1.2rem;
-    padding: 10px 20px;
-    margin-top: 10px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    color: white;
-    background-color: #ff8c00;
-}
-
-#startGameBtn:hover, #howToPlayBtn:hover {
-    transform: translateY(-3px);
-    background-color: #ffa500;
-}
-
-/* Modal for How to Play */
-#howToPlayModal {
-    display: none;
-    position: fixed;
-    z-index: 100;
-    left:0;
-    top:0;
-    width:100%;
-    height:100%;
-    overflow:auto;
-    background-color: rgba(0,0,0,0.5);
-}
-#howToPlayModal .modal-content {
-    background-color: #fff8dc;
-    margin: 15% auto;
-    padding: 20px;
-    border-radius: 12px;
-    width: 80%;
-    max-width: 400px;
-    text-align: center;
-    position: relative;
-}
-#howToPlayModal .close {
-    position: absolute;
-    top:10px;
-    right:15px;
-    font-size:24px;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-/* Footer */
-footer {
-  margin-top: 3rem;
-  color: #060606;
-  font-size: 0.8rem;
-  text-align: center;
-  animation: fadeIn 1s ease forwards;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem; /* space between logo and text */
-}
-
-.footer-logo {
-  width: 20px;      /* tiny size */
-  height: auto;
-  vertical-align: middle;
-}
-</style>
 </head>
 <body id="home">
-  <div class="home-container">
-    <main>
-      <h1>Word Guess</h1>
 
-      <p>Select or enter your name to start:</p>
+<header>
+  <img src="images/logo.png" alt="Game Hub Logo" />
+</header>
 
-      <!-- Dropdown for existing players -->
-      <select id="playerSelect">
-        <option value="" disabled selected>Choose a player</option>
-      </select>
-      <br>
+<div class="home-container">
+  <main>
+    <h1>Word Guess</h1>
+    <p>Select or enter your name to start:</p>
 
-      <!-- Input for new player -->
-      <input type="text" id="playerName" placeholder="Or enter new player name" />
-      <br>
+    <select id="playerSelect">
+      <option value="" disabled selected>Choose a player</option>
+    </select>
+    <br>
 
-      <button id="startGameBtn" class="control-btn">Start Game</button>
-      <br>
-      <button id="howToPlayBtn">❓ How to Play</button>
-    </main>
+    <input type="text" id="playerName" placeholder="Or enter new player name" />
+    <br>
 
-<footer>
-  <img src="images/logo.png" alt="Game Hub Logo" class="footer-logo" />
-  © 2025 Your Name — Hosted on GitHub Pages
-</footer>
+    <button id="startGameBtn" class="control-btn">Start Game</button>
+    <br>
+    <button id="howToPlayBtn">❓ How to Play</button>
+  </main>
+
+  <footer>
+    <img src="images/logo.png" alt="Game Hub Logo" class="footer-logo" />
+    © 2025 Your Name — Hosted on GitHub Pages
+  </footer>
+</div>
+
+<!-- How to Play Modal -->
+<div id="howToPlayModalHome">
+  <div class="modal-content">
+    <button class="close">&times;</button>
+    <h2>How to Play</h2>
+    <p>Guess the word by selecting letters or typing on your keyboard. Each guess must match the word length.</p>
+    <p>After each guess, tiles will change color:</p>
+    <ul style="text-align:left;">
+        <li><span style="color:#32cd32; font-weight:bold;">Green:</span> Correct letter in the correct spot</li>
+        <li><span style="color:#ffa500; font-weight:bold;">Orange:</span> Correct letter, wrong spot</li>
+        <li><span style="color:#d3d3d3; font-weight:bold;">Gray:</span> Letter not in word</li>
+    </ul>
+    <p>Use the “💡 Hint” button for a hint, and try to win consecutive games to build your streak!</p>
   </div>
+</div>
 
-  <!-- How to Play Modal -->
-  <div id="howToPlayModal">
-    <div class="modal-content">
-      <button class="close">&times;</button>
-      <h2>How to Play</h2>
- <p>Guess the word by selecting letters or typing on your keyboard. Each guess must match the word length.</p>
-        <p>After each guess, tiles will change color:</p>
-        <ul style="text-align:left;">
-            <li><span style="color:#32cd32; font-weight:bold;">Green:</span> Correct letter in the correct spot</li>
-            <li><span style="color:#ffa500; font-weight:bold;">Orange:</span> Correct letter, wrong spot</li>
-            <li><span style="color:#d3d3d3; font-weight:bold;">Gray:</span> Letter not in word</li>
-        </ul>
-        <p>Use the “💡 Clue” button for a hint, and try to win consecutive games to build your streak!</p>
-    </div>
-  </div>
+<script>
+  const startBtn = document.getElementById('startGameBtn');
+  const playerInput = document.getElementById('playerName');
+  const playerSelect = document.getElementById('playerSelect');
+ const howToPlayBtn = document.getElementById('howToPlayBtn');
+const howToPlayModal = document.getElementById('howToPlayModalHome'); // updated ID
+const closeModal = howToPlayModal.querySelector('.close');
 
-  <script>
-    const startBtn = document.getElementById('startGameBtn');
-    const playerInput = document.getElementById('playerName');
-    const playerSelect = document.getElementById('playerSelect');
-    const howToPlayBtn = document.getElementById('howToPlayBtn');
-    const howToPlayModal = document.getElementById('howToPlayModal');
-    const closeModal = howToPlayModal.querySelector('.close');
+  let players = JSON.parse(localStorage.getItem('players') || '[]');
 
-    let players = JSON.parse(localStorage.getItem('players') || '[]');
-
-    function renderPlayers() {
-      playerSelect.innerHTML = '<option value="" disabled selected>Choose a player</option>';
-      players.forEach(name => {
-        if (typeof name === 'string') {
-          const option = document.createElement('option');
-          option.value = name;
-          option.textContent = name;
-          playerSelect.appendChild(option);
-        }
-      });
-    }
-
-    startBtn.addEventListener('click', () => {
-      let name = playerInput.value.trim();
-      if (!name) name = playerSelect.value;
-      if (!name) return alert('Please select or enter a player name!');
-      if (!players.includes(name)) {
-        players.push(name);
-        localStorage.setItem('players', JSON.stringify(players));
+  // Render player options
+  function renderPlayers() {
+    playerSelect.innerHTML = '<option value="" disabled selected>Choose a player</option>';
+    players.forEach(name => {
+      if (typeof name === 'string') {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        playerSelect.appendChild(option);
       }
-      localStorage.setItem('currentPlayer', name);
-      window.location.href = 'game.html';
     });
+  }
 
-    howToPlayBtn.addEventListener('click', () => {
-      howToPlayModal.style.display = 'block';
-    });
-
-    closeModal.addEventListener('click', () => {
-      howToPlayModal.style.display = 'none';
-    });
-
-    window.addEventListener('click', (e) => {
-      if (e.target === howToPlayModal) howToPlayModal.style.display = 'none';
-    });
-
-    renderPlayers();
-
-    /* Continuous random spark animation */
-    const mainCard = document.querySelector('body#home main');
-    function createSpark() {
-      const spark = document.createElement('span');
-      spark.classList.add('spark');
-      const emojis = ['✨','💫','⭐','🌟','🔥'];
-      spark.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-      spark.style.left = Math.random()*80 + '%';
-      spark.style.top = Math.random()*30 + 'px';
-      mainCard.appendChild(spark);
-      setTimeout(() => spark.remove(), 2000);
+  // Start game button
+  startBtn.addEventListener('click', () => {
+    let name = playerInput.value.trim();
+    if (!name) name = playerSelect.value;
+    if (!name) return alert('Please select or enter a player name!');
+    if (!players.includes(name)) {
+      players.push(name);
+      localStorage.setItem('players', JSON.stringify(players));
     }
-    setInterval(createSpark, 300);
-  </script>
+    localStorage.setItem('currentPlayer', name);
+    window.location.href = 'game.html';
+  });
+
+
+
+howToPlayBtn.addEventListener('click', () => {
+    howToPlayModal.style.display = 'flex';
+});
+
+closeModal.addEventListener('click', () => {
+    howToPlayModal.style.display = 'none';
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target === howToPlayModal) howToPlayModal.style.display = 'none';
+});
+
+  // Click outside modal closes it
+  window.addEventListener('click', (e) => {
+    if (e.target === howToPlayModal) howToPlayModal.style.display = 'none';
+  });
+
+  renderPlayers();
+
+  // Spark animation
+  const mainCard = document.querySelector('body#home main');
+  function createSpark() {
+    const spark = document.createElement('span');
+    spark.classList.add('spark');
+    const emojis = ['✨','💫','⭐','🌟','🔥'];
+    spark.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    spark.style.left = Math.random()*80 + '%';
+    spark.style.top = Math.random()*30 + 'px';
+    mainCard.appendChild(spark);
+    setTimeout(() => spark.remove(), 2000);
+  }
+  setInterval(createSpark, 300);
+</script>
+
+
 </body>
 </html>
