@@ -21,17 +21,15 @@ const closeModal = statsModal.querySelector(".close");
 const homeBtn = document.getElementById("homeBtn");
 const streakDisplay = document.getElementById("streak");
 const wordLengthDisplay = document.getElementById("wordLengthDisplay");
-const fireworksCanvas = document.getElementById("fireworks");
-const clueBtn = document.getElementById("clueBtn");
-const clueText = document.getElementById("clueText");
+const fireworksVideo = document.getElementById("fireworksVideo");
+const fireworksSound = document.getElementById("fireworksSound");
+const hintBtn = document.getElementById("hintBtn");
 
 let solution = "";
 let solutionClue = "";
 let currentPlayer = localStorage.getItem('currentPlayer') || 'Guest';
 
-// ----------------------------
-// Child-friendly WORDS array
-// ----------------------------
+// Placeholder word array
 const WORDS = [
   {word:"BALL", clue:"Used in many games"},
   {word:"BIRD", clue:"Animal that flies in the sky"},
@@ -354,6 +352,9 @@ const WORDS = [
   {word:"PLANET", clue:"Orbits a star"}
 ];
 
+
+
+
 // Stats
 let totalGames = parseInt(localStorage.getItem(`${currentPlayer}_totalGames`) || 0);
 let totalWins = parseInt(localStorage.getItem(`${currentPlayer}_totalWins`) || 0);
@@ -383,12 +384,14 @@ function pickNewWord() {
     solution = obj.word.toUpperCase();
     solutionClue = obj.clue;
     wordLengthDisplay.textContent = `Today's word uses ${solution.length} letters`;
-    clueText.textContent = ""; // reset clue display
+
+    // Log word for testing
+    console.log("DEBUG: Today's word is:", solution);
 }
 
 function createBoard() {
     board.innerHTML = '';
-    board.style.gridTemplateColumns = `repeat(${solution.length}, 50px)`;
+    board.style.gridTemplateColumns = `repeat(${solution.length}, 50px)`; // horizontal tiles
     for (let i = 0; i < MAX_GUESSES; i++) {
         for (let j = 0; j < solution.length; j++) {
             const cell = document.createElement('div');
@@ -402,6 +405,7 @@ function createKeyboard() {
     keyboardDiv.innerHTML = '';
     let layout = currentLayout === "QWERTY" ? QWERTY : ALPHABET;
 
+    // Letter keys
     layout.forEach(letter => {
         const key = document.createElement('div');
         key.classList.add('key');
@@ -410,12 +414,14 @@ function createKeyboard() {
         keyboardDiv.appendChild(key);
     });
 
+    // Enter key
     const enterKey = document.createElement('div');
     enterKey.classList.add('key');
     enterKey.textContent = 'ENTER';
     enterKey.addEventListener('click', submitGuess);
     keyboardDiv.appendChild(enterKey);
 
+    // Backspace key
     const backKey = document.createElement('div');
     backKey.classList.add('key');
     backKey.textContent = '⌫';
@@ -443,132 +449,145 @@ function submitGuess() {
     for (let i = 0; i < solution.length; i++) {
         const cell = board.children[startIdx + i];
         if (currentGuess[i] === solution[i]) {
-            cell.classList.add('correct','animate');
-            letterStatus[currentGuess[i]]='correct';
+            cell.classList.add('correct', 'animate');
+            letterStatus[currentGuess[i]] = 'correct';
         } else if (solution.includes(currentGuess[i])) {
-            cell.classList.add('present','animate');
-            if(!letterStatus[currentGuess[i]]) letterStatus[currentGuess[i]]='present';
+            cell.classList.add('present', 'animate');
+            if (!letterStatus[currentGuess[i]]) letterStatus[currentGuess[i]] = 'present';
             correct = false;
         } else {
-            cell.classList.add('absent','animate');
-            letterStatus[currentGuess[i]]='absent';
+            cell.classList.add('absent', 'animate');
+            letterStatus[currentGuess[i]] = 'absent';
             correct = false;
         }
     }
+
     updateKeyboardColors();
-    if(correct){
-        message.textContent="🎉 You Win!";
+
+    if (correct) {
+        message.textContent = "🎉 You Win!";
         totalGames++;
         totalWins++;
         currentStreak++;
-        maxStreak=Math.max(maxStreak,currentStreak);
+        maxStreak = Math.max(maxStreak, currentStreak);
         saveStats();
         updateStatsDisplay();
         launchFireworks();
         return;
     }
+
     currentRow++;
-    currentGuess='';
-    if(currentRow>=MAX_GUESSES){
-        message.textContent=`❌ You Lose! Word was ${solution}`;
+    currentGuess = '';
+
+    if (currentRow >= MAX_GUESSES) {
+        message.textContent = `❌ You Lose! Word was ${solution}`;
         totalGames++;
-        currentStreak=0;
+        currentStreak = 0;
         saveStats();
         updateStatsDisplay();
     }
 }
 
 function updateKeyboardColors() {
-    document.querySelectorAll('.key').forEach(key=>{
-        if(letterStatus[key.textContent]){
+    document.querySelectorAll('.key').forEach(key => {
+        if (letterStatus[key.textContent]) {
             key.classList.remove('correct','present','absent');
             key.classList.add(letterStatus[key.textContent]);
         }
     });
 }
 
-function renderBoard(){
+function renderBoard() {
     const startIdx = currentRow * solution.length;
-    for(let i=0;i<solution.length;i++){
-        const cell = board.children[startIdx+i];
-        cell.textContent=currentGuess[i]||'';
+    for (let i = 0; i < solution.length; i++) {
+        const cell = board.children[startIdx + i];
+        cell.textContent = currentGuess[i] || '';
     }
 }
 
 // ----------------------------
-// Fireworks
+// Fireworks Video + Sound
 // ----------------------------
 function launchFireworks(){
-    const canvas=fireworksCanvas;
-    const ctx=canvas.getContext('2d');
-    canvas.width=window.innerWidth;
-    canvas.height=window.innerHeight;
-    canvas.style.display='block';
-    let particles=[];
-    function createParticles(x,y){
-        for(let i=0;i<50;i++){
-            particles.push({x,y,dx:(Math.random()-0.5)*8,dy:(Math.random()-0.5)*8,color:`hsl(${Math.random()*360},100%,50%)`,alpha:1});
-        }
-    }
-    function animate(){
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        particles.forEach(p=>{
-            p.x+=p.dx;
-            p.y+=p.dy;
-            p.alpha-=0.02;
-            ctx.fillStyle=`hsla(${Math.random()*360},100%,50%,${p.alpha})`;
-            ctx.beginPath();
-            ctx.arc(p.x,p.y,3,0,Math.PI*2);
-            ctx.fill();
-        });
-        particles=particles.filter(p=>p.alpha>0);
-        if(particles.length>0) requestAnimationFrame(animate);
-    }
-    for(let i=0;i<5;i++){
-        const x=Math.random()*canvas.width;
-        const y=Math.random()*canvas.height/2;
-        createParticles(x,y);
-    }
-    animate();
-    setTimeout(()=>{canvas.style.display='none';},5000);
+    // Video
+    fireworksVideo.style.display='block';
+    fireworksVideo.currentTime=0;
+    fireworksVideo.play();
+
+    // Sound
+    fireworksSound.currentTime=0;
+    fireworksSound.play();
+
+    setTimeout(()=>{
+        fireworksVideo.pause();
+        fireworksVideo.style.display='none';
+        fireworksSound.pause();
+    },5000);
 }
+
+const howToPlayBtn = document.getElementById("howToPlayBtn");
+const howToPlayModal = document.getElementById("howToPlayModal");
+const closeHowToPlay = howToPlayModal.querySelector(".close");
+
 
 // ----------------------------
 // Event Listeners
 // ----------------------------
-document.addEventListener('keydown',e=>{
-    if(/^[a-zA-Z]$/.test(e.key)) handleKey(e.key.toUpperCase());
-    if(e.key==='Enter') submitGuess();
-    if(e.key==='Backspace'){currentGuess=currentGuess.slice(0,-1); renderBoard();}
+document.addEventListener('keydown', (e)=>{
+    if (/^[a-zA-Z]$/.test(e.key)) handleKey(e.key.toUpperCase());
+    if (e.key === 'Enter') submitGuess();
+    if (e.key === 'Backspace') {
+        currentGuess = currentGuess.slice(0,-1);
+        renderBoard();
+    }
 });
 
-toggleBtn.addEventListener('click',()=>{
-    currentLayout=currentLayout==="QWERTY"?"ALPHABET":"QWERTY";
-    toggleBtn.textContent=currentLayout==="QWERTY"?"Alpha Keyboard":"QWERTY Keyboard";
+toggleBtn.addEventListener('click', () => {
+    currentLayout = currentLayout === "QWERTY" ? "ALPHABET" : "QWERTY";
+    toggleBtn.textContent = currentLayout === "QWERTY" ? "Alpha Keyboard" : "QWERTY Keyboard";
     createKeyboard();
 });
 
-newGameBtn.addEventListener('click',()=>{resetGame();});
-statsBtn.addEventListener('click',()=>{statsModal.style.display='block';});
-closeModal.addEventListener('click',()=>{statsModal.style.display='none';});
-homeBtn.addEventListener('click',()=>{window.location.href='index.html';});
+newGameBtn.addEventListener('click', ()=>{ resetGame(); });
 
-// Clue Button
-clueBtn.addEventListener('click',()=>{
-    clueText.textContent = solutionClue;
+statsBtn.addEventListener('click', ()=>{ statsModal.style.display='block'; });
+closeModal.addEventListener('click', ()=>{ statsModal.style.display='none'; });
+homeBtn.addEventListener('click', ()=>{ window.location.href = 'index.html'; });
+
+hintBtn.addEventListener("click", ()=>{
+    if(solutionClue){
+        message.textContent = `💡 Hint: ${solutionClue}`;
+    } else {
+        message.textContent = "No hint available!";
+    }
 });
 
-window.addEventListener('click',e=>{if(e.target===statsModal) statsModal.style.display='none';});
+window.addEventListener('click', (e)=>{
+    if(e.target === statsModal) statsModal.style.display='none';
+});
+
+howToPlayBtn.addEventListener("click", ()=>{
+    howToPlayModal.style.display = "block";
+});
+
+closeHowToPlay.addEventListener("click", ()=>{
+    howToPlayModal.style.display = "none";
+});
+
+// Close modal if clicked outside
+window.addEventListener('click', (e)=>{
+    if(e.target === howToPlayModal) howToPlayModal.style.display='none';
+});
+
 
 // ----------------------------
-// Reset / Initialize
+// Reset / Initialize Game
 // ----------------------------
-function resetGame(){
+function resetGame() {
     currentRow=0;
     currentGuess='';
     letterStatus={};
     message.textContent='';
-    clueText.textContent='';
     pickNewWord();
     createBoard();
     createKeyboard();

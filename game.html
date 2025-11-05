@@ -28,16 +28,34 @@
       <div class="buttons-row">
         <button id="newGameBtn" class="control-btn">🔄 New Game</button>
         <button id="statsBtn" class="control-btn">📊 Statistics</button>
+		<button id="howToPlayBtn" class="control-btn">❓ How to Play</button>
         <button id="toggleKeyboardBtn" class="control-btn">Alpha Keyboard</button>
-		<button id="clueBtn" class="control-btn">💡 Clue</button>
+		<button id="hintBtn" class="control-btn">💡 Hint</button>
         <button id="homeBtn" class="control-btn">🏠 Home</button>
       </div>
-	  <p id="clueText" style="font-size:1.2rem; margin-top:10px;"></p>
     </div>
   </section>
 
   <!-- Fireworks canvas -->
-  <canvas id="fireworks"></canvas>
+<!-- Fireworks Video -->
+<video id="fireworksVideo" autoplay muted style="
+    display:none;
+    width:60%;
+    max-width:600px;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform: translate(-50%, -50%);
+    z-index:50;
+    pointer-events:none;
+    border-radius:12px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.7);
+">
+  <source src="images/fireworks.mp4" type="video/mp4">
+</video>
+
+<!-- Firework sound -->
+<audio id="fireworksSound" src="sounds/fireworks.mp3"></audio>
 
   <!-- Statistics Modal -->
   <div id="statsModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="statsTitle">
@@ -64,6 +82,22 @@
       </div>
     </div>
   </div>
+
+<!-- How to Play Modal -->
+<div id="howToPlayModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="howToPlayTitle">
+    <div class="modal-content">
+        <button class="close" aria-label="Close">&times;</button>
+        <h2 id="howToPlayTitle">How to Play</h2>
+        <p>Guess the word by selecting letters or typing on your keyboard. Each guess must match the word length.</p>
+        <p>After each guess, tiles will change color:</p>
+        <ul style="text-align:left;">
+            <li><span style="color:#32cd32; font-weight:bold;">Green:</span> Correct letter in the correct spot</li>
+            <li><span style="color:#ffa500; font-weight:bold;">Orange:</span> Correct letter, wrong spot</li>
+            <li><span style="color:#d3d3d3; font-weight:bold;">Gray:</span> Letter not in word</li>
+        </ul>
+        <p>Use the “💡 Clue” button for a hint, and try to win consecutive games to build your streak!</p>
+    </div>
+</div>
 
   <script src="script.js"></script>
 </body>
