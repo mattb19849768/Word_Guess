@@ -3,127 +3,89 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Word Guess - Select Player</title>
+<title>Sudoku</title>
 <link rel="stylesheet" href="style.css">
 </head>
-<body id="home">
+<body>
 
-<header>
-  <img src="images/logo.png" alt="Game Hub Logo" />
-</header>
+<!-- Home Screen -->
+<div id="screen-home">
+    <div class="home-container">
+        <h1>Sudoku</h1>
 
-<div class="home-container">
-  <main>
-    <h1>Word Guess</h1>
-    <p>Select or enter your name to start:</p>
+        <div class="player-area">
+            <input id="playerNameInput" placeholder="enter player name">
+            <button id="addPlayerBtn">Add</button>
+        </div>
 
-    <select id="playerSelect">
-      <option value="" disabled selected>Choose a player</option>
-    </select>
-    <br>
+        <select id="playerSelect"></select>
 
-    <input type="text" id="playerName" placeholder="Or enter new player name" />
-    <br>
-
-    <button id="startGameBtn" class="control-btn">Start Game</button>
-    <br>
-    <button id="howToPlayBtn" class="control-btn">❓ How to Play</button>
-  </main>
-
-  <footer>
-    <img src="images/logo.png" alt="Game Hub Logo" class="footer-logo" />
-    © 2025 Your Name — Hosted on GitHub Pages
-  </footer>
+        <select id="difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+  <a href="https://mattb19849768.github.io/Game-hub/" id="gameHub" class="button" style="text-decoration: none;">Game Hub</a>
+        <button id="playBtn" class="greenBtn">▶ Start Game</button>
+        <button id="leaderboardBtn">🏆 Leaderboard</button>
+    </div>
 </div>
 
-<!-- How to Play Modal -->
-<div id="howToPlayModalHome">
-  <div class="modal-content">
-    <button class="close">&times;</button>
-    <h2>How to Play</h2>
-    <p>Guess the word by selecting letters or typing on your keyboard. Each guess must match the word length.</p>
-    <p>After each guess, tiles will change color:</p>
-    <ul style="text-align:left;">
-        <li><span style="color:#32cd32; font-weight:bold;">Green:</span> Correct letter in the correct spot</li>
-        <li><span style="color:#ffa500; font-weight:bold;">Orange:</span> Correct letter, wrong spot</li>
-        <li><span style="color:#d3d3d3; font-weight:bold;">Gray:</span> Letter not in word</li>
-    </ul>
-    <p>Use the “💡 Hint” button for a hint, and try to win consecutive games to build your streak!</p>
+
+<!-- Game Screen -->
+<div id="screen-game" class="hidden">
+    <div class="game-header">
+        <div id="gameInfo">
+            Player: <span id="currentPlayerDisplay"></span> |
+            Difficulty: <span id="currentDifficulty"></span> |
+            Errors: <span id="errorCount">0</span> |
+            Time: <span id="timer">0:00</span>
+        </div>
+
+        <div class="game-buttons">
+            <button id="newGameBtn">New Game</button>
+            <button id="checkBtn">Check</button>
+            <button id="solveBtn">Solve</button>
+            <button id="exitBtn">Exit</button>
+        </div>
+    </div>
+
+    <div id="sudoku"></div>
+
+    <div id="numpad">
+        <button class="numkey">1</button>
+        <button class="numkey">2</button>
+        <button class="numkey">3</button>
+        <button class="numkey">4</button>
+        <button class="numkey">5</button>
+        <button class="numkey">6</button>
+        <button class="numkey">7</button>
+        <button class="numkey">8</button>
+        <button class="numkey">9</button>
+        <button id="clearKey"><img src="images/eraser.jpg" alt="Eraser"></button>
+    </div>
+
+    <canvas id="fx"></canvas>
+</div>
+
+<!-- Win Modal -->
+<div id="winModal" class="hidden">
+    <div class="modalBox">
+        <h2>Completed!</h2>
+        <div id="winTime"></div>
+        <button id="closeWinBtn">OK</button>
+    </div>
+</div>
+
+<!-- Leaderboard Modal -->
+<div id="leaderboardModal" class="hidden">
+  <div class="modalBox">
+    <h2>Leaderboard</h2>
+    <div id="leaderboardContent"></div>
+    <button id="closeLeaderboardBtn">Close</button>
   </div>
 </div>
 
-<script>
-  const startBtn = document.getElementById('startGameBtn');
-  const playerInput = document.getElementById('playerName');
-  const playerSelect = document.getElementById('playerSelect');
- const howToPlayBtn = document.getElementById('howToPlayBtn');
-const howToPlayModal = document.getElementById('howToPlayModalHome'); // updated ID
-const closeModal = howToPlayModal.querySelector('.close');
-
-  let players = JSON.parse(localStorage.getItem('players') || '[]');
-
-  // Render player options
-  function renderPlayers() {
-    playerSelect.innerHTML = '<option value="" disabled selected>Choose a player</option>';
-    players.forEach(name => {
-      if (typeof name === 'string') {
-        const option = document.createElement('option');
-        option.value = name;
-        option.textContent = name;
-        playerSelect.appendChild(option);
-      }
-    });
-  }
-
-  // Start game button
-  startBtn.addEventListener('click', () => {
-    let name = playerInput.value.trim();
-    if (!name) name = playerSelect.value;
-    if (!name) return alert('Please select or enter a player name!');
-    if (!players.includes(name)) {
-      players.push(name);
-      localStorage.setItem('players', JSON.stringify(players));
-    }
-    localStorage.setItem('currentPlayer', name);
-    window.location.href = 'game.html';
-  });
-
-
-
-howToPlayBtn.addEventListener('click', () => {
-    howToPlayModal.style.display = 'flex';
-});
-
-closeModal.addEventListener('click', () => {
-    howToPlayModal.style.display = 'none';
-});
-
-window.addEventListener('click', (e) => {
-    if (e.target === howToPlayModal) howToPlayModal.style.display = 'none';
-});
-
-  // Click outside modal closes it
-  window.addEventListener('click', (e) => {
-    if (e.target === howToPlayModal) howToPlayModal.style.display = 'none';
-  });
-
-  renderPlayers();
-
-  // Spark animation
-  const mainCard = document.querySelector('body#home main');
-  function createSpark() {
-    const spark = document.createElement('span');
-    spark.classList.add('spark');
-    const emojis = ['✨','💫','⭐','🌟','🔥'];
-    spark.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-    spark.style.left = Math.random()*80 + '%';
-    spark.style.top = Math.random()*30 + 'px';
-    mainCard.appendChild(spark);
-    setTimeout(() => spark.remove(), 2000);
-  }
-  setInterval(createSpark, 300);
-</script>
-
-
+<script src="script.js"></script>
 </body>
 </html>
