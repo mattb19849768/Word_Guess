@@ -5,18 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Word Guess</title>
 <link rel="stylesheet" href="style.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </head>
 <body id="gameArea">
 
 <header>
-  <!-- <img src="images/logo.png" alt="Game Hub Logo" /> -->
-  <h1>Word Guess</h1>
-  <p>Try to guess today's word!</p>
+  <div class=" p-3 mb-3 rounded shadow text-center d-flex justify-content-between align-items-center flex-wrap"><h1 style="display:inline-block;">Word Guess</h1>
+  
+  <div class="dropdown" style="display:inline-block; margin-left: 20px; vertical-align: middle;">
+      <button class="btn btn-secondary dropdown-toggle" type="button" id="gameMenuBtn" data-bs-toggle="dropdown" aria-expanded="false">
+          ⚙️ Menu
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="gameMenuBtn">
+      <li><button id="newGameBtn" class="dropdown-item">🔄 New Game</button></li>
+      <li><button id="statsBtn" class="dropdown-item">📊 Statistics</button></li>
+      <li><button id="howToPlayBtn" class="dropdown-item">❓ How to Play</button></li>
+      <li><button id="toggleKeyboardBtn" class="dropdown-item">Alpha Keyboard</button></li>
+      <li><button id="hintBtn" class="dropdown-item">💡 Hint</button></li>
+      <li><button id="homeBtn" class="dropdown-item">🏠 Home</button></li>
+      </ul>
+  </div><!-- </div> -->
+
   <div class="top-info">
     <div class="streak-block">🔥 Current Streak: <span id="streak">0</span></div>
     <div class="word-length-block" id="wordLengthDisplay">Today's word uses 5 letters</div>
-  </div>
+  </div></div>
 </header>
+
 
 <section id="gameContainer">
   <div id="boardWrapper">
@@ -32,14 +49,14 @@
 
   <div id="controls">
     <p id="message" aria-live="polite"></p>
-    <div class="buttons-row">
+    <!-- <div class="buttons-row">
       <button id="newGameBtn" class="control-btn">🔄 New Game</button>
       <button id="statsBtn" class="control-btn">📊 Statistics</button>
       <button id="howToPlayBtn" class="control-btn">❓ How to Play</button>
       <button id="toggleKeyboardBtn" class="control-btn">Alpha Keyboard</button>
       <button id="hintBtn" class="control-btn">💡 Hint</button>
       <button id="homeBtn" class="control-btn">🏠 Home</button>
-    </div>
+    </div> -->
   </div>
 </section>
 
@@ -130,5 +147,88 @@
 </footer>
 
 <script src="script.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const header = document.querySelector('body#gameArea header');
+
+    // Create hamburger menu button
+    const hamburger = document.createElement('div');
+    hamburger.classList.add('header-hamburger');
+    hamburger.innerHTML = '&#9776;'; // Hamburger icon
+    header.appendChild(hamburger);
+
+    // Create collapsed menu container
+    const collapsedMenu = document.createElement('div');
+    collapsedMenu.classList.add('collapsed-menu');
+
+    // Close button inside menu
+    const closeBtn = document.createElement('div');
+    closeBtn.classList.add('close');
+    closeBtn.innerHTML = '&times;';
+    collapsedMenu.appendChild(closeBtn);
+
+    // Append collapsed menu to body
+    document.body.appendChild(collapsedMenu);
+
+    const controlsContainer = document.querySelector('.controls-container');
+
+    // Function to open menu
+    const openMenu = () => {
+        collapsedMenu.style.display = 'flex';
+        // Move buttons into menu
+        if (controlsContainer) {
+            const buttons = controlsContainer.querySelectorAll('.control-btn');
+            buttons.forEach(btn => collapsedMenu.appendChild(btn));
+        }
+    };
+
+    // Function to close menu
+    const closeMenu = () => {
+        collapsedMenu.style.display = 'none';
+        // Move buttons back to original container
+        if (controlsContainer) {
+            const buttons = collapsedMenu.querySelectorAll('.control-btn');
+            buttons.forEach(btn => controlsContainer.appendChild(btn));
+        }
+    };
+
+    // Hamburger click opens menu
+    hamburger.addEventListener('click', openMenu);
+
+    // Close button click closes menu
+    closeBtn.addEventListener('click', closeMenu);
+
+    // Close menu if clicking outside menu content
+    collapsedMenu.addEventListener('click', (e) => {
+        if (e.target === collapsedMenu) closeMenu();
+    });
+
+    // Close menu on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && collapsedMenu.style.display === 'flex') closeMenu();
+    });
+
+    // Responsive: hide hamburger on wide screens
+    const handleResize = () => {
+        const screenWide = window.innerWidth > 768;
+        if (screenWide) {
+            hamburger.style.display = 'none';
+            collapsedMenu.style.display = 'none';
+            // Move buttons back
+            if (controlsContainer) {
+                const buttons = collapsedMenu.querySelectorAll('.control-btn');
+                buttons.forEach(btn => controlsContainer.appendChild(btn));
+            }
+        } else {
+            hamburger.style.display = 'block';
+        }
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize();
+});
+</script>
+
+
 </body>
 </html>

@@ -155,7 +155,6 @@ body#home #howToPlayModal .close {
 
 /* Footer */
 footer {
-    margin-top: 3rem;
     color: #060606;
     font-size: 0.8rem;
     text-align: center;
@@ -183,12 +182,19 @@ body#gameArea {
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
+    overflow-x: hidden; /* prevent horizontal scroll */
 }
 
 /* Header for game page */
 body#gameArea header {
     text-align: center;
     margin-top: 20px;
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 body#gameArea header h1 {
     font-size: 2.5rem;
@@ -196,11 +202,24 @@ body#gameArea header h1 {
     letter-spacing: 2px;
     color: #00ffe1;
     text-shadow: 0 0 10px #00ffe1, 0 0 30px #00ffe1;
+    margin: 0;
 }
 body#gameArea header p {
     color: #aaa;
     margin-top: 0.5rem;
     font-size: 1rem;
+}
+
+/* Hamburger menu button */
+.header-hamburger {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #00ffe1;
+    user-select: none;
 }
 
 /* Top info blocks in game */
@@ -281,6 +300,7 @@ body#gameArea header p {
     transition: background 0.2s;
     text-align: center;
     min-width: 35px;
+    flex: 1 1 auto; /* avoid stretching issues */
 }
 
 .key.correct { background-color: #32cd32; color:white; }
@@ -290,8 +310,8 @@ body#gameArea header p {
 /* Controls */
 #controls { text-align: center; }
 .buttons-row { display:flex; justify-content:center; gap:10px; margin-top:10px; flex-wrap: wrap; }
-.control-btn { background-color:#ff8c00; color:white; font-weight:bold; border:none; border-radius:6px; padding:8px 16px; cursor:pointer; font-size:1rem; transition: background 0.2s; }
-.control-btn:hover { background-color:#ffa500; }
+.control-btn { background-color:#4CAF50; color:white; font-weight:bold; border:none; border-radius:6px; padding:10px 20px; cursor:pointer; font-size:16px; transition: background-color 0.2s; }
+.control-btn:hover { background-color:#45a049; }
 
 /* Hint Text */
 #hintText {
@@ -385,29 +405,82 @@ body#home #howToPlayModalHome {
     color: #ff4500;
 }
 
-/* Common style for all main control buttons */
-/* Common style for control buttons */
-.control-btn {
-    padding: 10px 20px; /* padding for top/bottom and left/right */
-    background-color: #4CAF50;
+/* --------------------------- */
+/* Hamburger menu styles       */
+/* --------------------------- */
+.collapsed-menu {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 250px;
+    height: 100%;
+    background-color: rgba(0,0,0,0.95);
+    z-index: 150;
+    flex-direction: column;
+    padding-top: 60px;
+}
+.collapsed-menu .control-btn {
+    display: block;
+    width: 80%;
+    margin: 10px auto;
+}
+.collapsed-menu .close {
+    top: 15px;
+    right: 20px;
     color: white;
-    border: none;
-    border-radius: 6px;
+    font-size: 2rem;
+}
+
+/* --------------------------- */
+/* Responsive adjustments      */
+/* --------------------------- */
+@media (max-width: 768px) {
+    body#gameArea header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .header-hamburger {
+        display: block;
+    }
+    .top-info {
+        flex-direction: column;
+        gap: 5px;
+        margin-top: 5px;
+    }
+    #board {
+        grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+    }
+}
+
+.header-hamburger {
+    font-size: 2rem;
     cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    margin: 5px;
-    transition: background-color 0.2s;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: #ffffff;
+    user-select: none;
+    z-index: 200;
 }
 
-.control-btn:hover {
-    background-color: #45a049;
-}
-
-/* Container for buttons */
-.controls-container {
-    display: flex;
+.collapsed-menu {
+    display: none;
+    position: fixed;
+    z-index: 150;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3); /* semi-transparent */
     justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
+    align-items: center;
+    flex-direction: column;
+}
+
+.collapsed-menu .control-btn {
+    margin: 10px 0;
+    min-width: 150px;
+    font-size: 1.2rem;
 }
